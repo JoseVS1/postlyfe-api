@@ -4,6 +4,7 @@ const isLoggedIn = require("../middleware/isLoggedIn");
 
 const authRoutes = Router();
 
+authRoutes.get("/status", authController.getStatus);
 authRoutes.post("/signup", authController.postSignup);
 authRoutes.post("/login", authController.postLogin);
 authRoutes.get("/logout", isLoggedIn, authController.logout);

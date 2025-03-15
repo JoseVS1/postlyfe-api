@@ -3,6 +3,14 @@ const Profile = require("../models/prismaClient").profile;
 const passport = require("passport");
 const genPassword = require("../utils/genPassword");
 
+const getStatus = (req, res) => {
+    if (req.isAuthenticated()) {
+        res.json({ isAuthenticated: true, user: req.user });
+    } else {
+        res.json({ isAuthenticated: false });
+    };
+};
+
 const postSignup = async (req, res, next) => {
     try {
         const {username, email, password, confirmPassword} = req.body;
@@ -79,6 +87,7 @@ const logout = (req, res, next) => {
 };
 
 module.exports = {
+    getStatus,
     postSignup,
     postLogin,
     logout
