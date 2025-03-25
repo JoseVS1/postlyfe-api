@@ -2,11 +2,18 @@ const Follow = require("../models/prismaClient").follow;
 
 const getFollowersStatus = async (req, res) => {
     try {
+        const accepted = req.query.accepted || null;
         const followersStatus = await Follow.findMany({
             where: {
                 followerId: req.user.id
             }
         });
+
+        if (accepted === "true") {
+            const acceptedStatus = followersStatus.filter(f => f.status === "accepted");
+
+            return res.status(200).json({ message: "Accepted following status retrieved successfully", followersStatus: acceptedStatus });
+        };
 
         return res.status(200).json({ message: "Followers status retrieved successfully", followersStatus });
     } catch (err) {
@@ -18,10 +25,18 @@ const getFollowStatus = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const followStatus = await Follow.findUnique({
+        const followStatus = await Follow.findFirst({
             where: {
-                userId: id,
-                followerId: req.user.id
+                OR: [
+                    {
+                        userId: id,
+                        followerId: req.user.id
+                    },
+                    {
+                        userId: req.user.id,
+                        followerId: id
+                    }
+                ]
             }
         });
 
@@ -38,6 +53,29 @@ const getFollowStatus = async (req, res) => {
 const postCreateFollow = async (req, res) => {
     try {
         const { id } = req.body;
+
+        const followStatus = await Follow.findFirst({
+            where: {
+                OR: [
+                    {
+                        userId: id,
+                        followerId: req.user.id
+                    },
+                    {
+                        userId: req.user.id,
+                        followerId: id
+                    }
+                ]
+            }
+        });
+
+        if (followStatus) {
+            const deletedFollowStatus = await Follow.delete({
+                where: {
+                    id: followStatus.id
+                }
+            });
+        }
 
         const newFollow = await Follow.create({
             data: {
@@ -58,9 +96,18 @@ const putUpdateFollow = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
 
-        const followStatus = await Follow.findUnique({
+        const followStatus = await Follow.findFirst({
             where: {
-                id
+                OR: [
+                    {
+                        userId: id,
+                        followerId: req.user.id
+                    },
+                    {
+                        userId: req.user.id,
+                        followerId: id
+                    }
+                ]
             }
         });
 
@@ -70,7 +117,7 @@ const putUpdateFollow = async (req, res) => {
 
         const newFollow = await Follow.update({
             where: {
-                id
+                id: followStatus.id
             },
             data: {
                 status

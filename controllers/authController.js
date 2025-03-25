@@ -2,10 +2,20 @@ const User = require("../models/prismaClient").user;
 const Profile = require("../models/prismaClient").profile;
 const passport = require("passport");
 const genPassword = require("../utils/genPassword");
+const getGravatarUrl = require("../utils/generate-gravatar");
 
-const getStatus = (req, res) => {
+const getStatus = async (req, res) => {
     if (req.isAuthenticated()) {
-        res.json({ isAuthenticated: true, user: req.user });
+        const user = await User.findUnique({
+            where: {
+                id: req.user.id
+            },
+            include: {
+                profile: true
+            }
+        });
+        
+        res.json({ isAuthenticated: true, user });
     } else {
         res.json({ isAuthenticated: false });
     };
@@ -38,7 +48,9 @@ const postSignup = async (req, res, next) => {
                 email: email,
                 password: genPassword(password),
                 profile: {
-                    create: {}
+                    create: {
+                        profilePictureUrl: getGravatarUrl(email)
+                    }
                 }
             },
             include: {
@@ -46,7 +58,20 @@ const postSignup = async (req, res, next) => {
             }
         });
 
-        req.login(newUser, err => {
+        // passport.authenticate("local", { keepSessionInfo: true }, (err, newUser, info) => {
+        //     if (err) return next(err);
+            
+        //     if (!newUser) {
+        //         return res.status(401).json({ message: "Invalid username or password" });
+        //     };
+    
+        //     req.logIn(newUser, (err) => {
+        //         if (err) return next(err);
+        //         return res.json({ message: "Logged in successfully", user: newUser});
+        //     });
+        // })(req, res, next);
+
+        req.logIn(newUser, err => {
             if (err) {
                 return next(err);
             }
@@ -62,9 +87,9 @@ const postSignup = async (req, res, next) => {
 };
 
 const postLogin = (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", { keepSessionInfo: true }, (err, user, info) => {
         if (err) return next(err);
-
+        
         if (!user) {
             return res.status(401).json({ message: "Invalid username or password" });
         };
@@ -77,7 +102,7 @@ const postLogin = (req, res, next) => {
 };
 
 const logout = (req, res, next) => {
-    req.logout(err => {
+    req.logout({ keepSessionInfo: true }, err => {
         if (err) {
             return next(err);
         }

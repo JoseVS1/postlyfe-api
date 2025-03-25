@@ -28,6 +28,17 @@ const postCreateLike = async (req, res) => {
     try {
         const { postId } = req.body;
 
+        const liked = await Like.findFirst({
+            where: {
+                postId,
+                userId: req.user.id
+            }
+        });
+
+        if (liked) {
+            return res.status(400).json({ message: "Post already liked" });
+        };
+
         const newLike = await Like.create({
             data: {
                 postId,
@@ -59,6 +70,17 @@ const postCreateLike = async (req, res) => {
 const deleteLike = async (req, res) => {
     try {
         const { id } = req.params;
+
+        const liked = await Like.findFirst({
+            where: {
+                postId: id,
+                userId: req.user.id
+            }
+        });
+
+        if (!liked) {
+            return res.status(404).json({ message: "Like not found" });
+        };
 
         const deletedLike = await Like.deleteMany({
             where: {

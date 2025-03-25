@@ -2,7 +2,14 @@ const Post = require("../models/prismaClient").post;
 
 const getPosts = async (req, res) => {
     try {
-        const posts = await Post.findMany();
+        const posts = await Post.findMany({
+            where: {
+                isDeleted: false
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
 
         return res.status(200).json({ message: "Posts retrieved successfully", posts });
     } catch (err) {
@@ -57,6 +64,10 @@ const putUpdatePost = async (req, res) => {
                 id
             }
         });
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        };
 
         if (post.userId !== req.user.id) {
             return res.status(401).json({ message: "Post belongs to another user" });

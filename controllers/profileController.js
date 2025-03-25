@@ -3,7 +3,12 @@ const Profile = require("../models/prismaClient").profile;
 const putUpdateProfile = async (req, res) => {
     try {
         const { id } = req.params;
-        const { firstName, lastName, birthDate, gender, bio, profilePictureUrl} = req.body;
+        const { firstName, lastName, gender, bio, profilePictureUrl} = req.body;
+        let birthDate = req.body.birthDate;
+
+        if (birthDate) {
+            birthDate = new Date(birthDate);
+        };
 
         const newProfile = await Profile.update({
             where: {

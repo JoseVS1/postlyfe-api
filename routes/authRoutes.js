@@ -7,6 +7,6 @@ const authRoutes = Router();
 authRoutes.get("/status", authController.getStatus);
 authRoutes.post("/signup", authController.postSignup);
 authRoutes.post("/login", authController.postLogin);
-authRoutes.get("/logout", isLoggedIn, authController.logout);
+authRoutes.get("/logout", authController.logout);
 
 module.exports = authRoutes;
