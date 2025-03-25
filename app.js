@@ -10,10 +10,14 @@ const app = express();
 require("dotenv").config();
 require("./config/passport");
 
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
-}));
+const corsOptions = {
+    origin: 'https://postlyfe-frontend.onrender.com',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+  
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
