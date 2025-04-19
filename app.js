@@ -11,7 +11,7 @@ require("dotenv").config();
 require("./config/passport");
 
 const corsOptions = {
-    origin: 'https://postlyfe-frontend.onrender.com',
+    origin: 'http://localhost:5173',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']

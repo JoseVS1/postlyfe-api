@@ -5,19 +5,23 @@ const genPassword = require("../utils/genPassword");
 const getGravatarUrl = require("../utils/generate-gravatar");
 
 const getStatus = async (req, res) => {
-    if (req.isAuthenticated()) {
-        const user = await User.findUnique({
-            where: {
-                id: req.user.id
-            },
-            include: {
-                profile: true
-            }
-        });
-        
-        res.json({ isAuthenticated: true, user });
-    } else {
-        res.json({ isAuthenticated: false });
+    try {
+        if (req.isAuthenticated()) {
+            const user = await User.findUnique({
+                where: {
+                    id: req.user.id
+                },
+                include: {
+                    profile: true
+                }
+            });
+            
+            res.json({ isAuthenticated: true, user });
+        } else {
+            res.json({ isAuthenticated: false });
+        };     
+    } catch (err) {
+        return res.status(500).json({ message: "Internal server error." });
     };
 };
 
@@ -57,19 +61,6 @@ const postSignup = async (req, res, next) => {
                 profile: true
             }
         });
-
-        // passport.authenticate("local", { keepSessionInfo: true }, (err, newUser, info) => {
-        //     if (err) return next(err);
-            
-        //     if (!newUser) {
-        //         return res.status(401).json({ message: "Invalid username or password" });
-        //     };
-    
-        //     req.logIn(newUser, (err) => {
-        //         if (err) return next(err);
-        //         return res.json({ message: "Logged in successfully", user: newUser});
-        //     });
-        // })(req, res, next);
 
         req.logIn(newUser, err => {
             if (err) {

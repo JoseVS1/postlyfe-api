@@ -41,7 +41,7 @@ const getFollowStatus = async (req, res) => {
         });
 
         if (!followStatus) {
-            return res.status(404).json({ message: "No status" });
+            return res.status(404);
         };
 
         return res.status(200).json({ message: "Follower status retrieved successfully", followStatus });
