@@ -174,7 +174,7 @@ Base Path: `/api`
 
 ## License
 
-[MIT License](LICENSE)
+MIT License
 
 ## Acknowledgements
 
