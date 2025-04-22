@@ -163,7 +163,6 @@ Base Path: `/api`
 -   Sessions are managed using `express-session` with `connect-pg-simple` for persistent storage.
 -   Protected routes require authentication using the `isLoggedIn` middleware.
 -   CORS is configured to allow requests only from the specified frontend origin.
--   Input validation should be considered for enhancement (not explicitly shown in provided code).
 
 ## Contributing
 
